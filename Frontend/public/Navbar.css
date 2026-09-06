@@ -1,0 +1,30 @@
+.profile-menu {
+  position: fixed; top: 0; right: 0; left: 270px; z-index: 100;
+  height: 64px; padding: 0 20px; display: flex; align-items: center;
+  justify-content: flex-end; gap: 9px; background: rgba(255,255,255,.92);
+  border-bottom: 1px solid #e8e8e8; box-shadow: 0 1px 8px rgba(0,0,0,.03);
+  backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+}
+.profile-avatar {
+  width: 28px; height: 28px; flex: 0 0 28px; display: grid; place-items: center;
+  border-radius: 50%; background: #879392; color: #fff;
+  font-size: 10px; font-weight: 500; letter-spacing: .2px;
+}
+.profile-info { min-width: 0; text-align: left; line-height: 1.25; }
+.profile-name { margin: 0; color: #1f1f1f; font-size: 14px; font-weight: 400; white-space: nowrap; }
+.profile-plan { margin: 1px 0 0; color: #888; font-size: 12px; }
+.profile-divider { width: 1px; height: 28px; margin: 0 2px 0 6px; background: #e2e2e2; }
+.logout-btn {
+  min-height: 38px; padding: 0 13px; display: inline-flex; align-items: center;
+  justify-content: center; gap: 8px; border: 1px solid transparent; border-radius: 10px;
+  background: transparent; color: #4a4a4a; font: inherit; font-size: 13px; font-weight: 500;
+  cursor: pointer; transition: background-color .18s, color .18s, border-color .18s;
+}
+.logout-btn:hover { color: #c83b3b; background: #fff4f4; border-color: #f4dede; }
+.logout-btn:focus-visible { outline: 2px solid #333; outline-offset: 2px; }
+@media (max-width: 760px) {
+  .profile-menu { left: 76px; height: 64px; padding: 0 14px; }
+  .profile-divider { display: none; }
+  .logout-btn { width: 38px; padding: 0; font-size: 0; }
+  .logout-btn i { font-size: 15px; }
+}

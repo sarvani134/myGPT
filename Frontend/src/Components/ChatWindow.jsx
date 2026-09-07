@@ -1,4 +1,4 @@
-import React, { useState, useContext } from "react";
+import React, { useState, useContext, useRef, useEffect } from "react";
 import NavBar from "./NavBar";
 import "../../public/ChatWindow.css";
 import { MyContext } from "../MyContext";
@@ -12,18 +12,34 @@ function ChatWindow() {
   const { getAccessTokenSilently } = useAuth0();
 
   const [message, setMessage] = useState("");
+  const [sendError, setSendError] = useState("");
+  const sendingRef = useRef(false);
+  const messagesEndRef = useRef(null);
 
   const {
     threadId,
     setThreadId,
     messages,
-    setMessages
+    setMessages,
+    isSending,
+    setIsSending
   } = useContext(MyContext);
 
+  useEffect(() => {
+    messagesEndRef.current?.scrollIntoView({ block: "nearest" });
+  }, [messages, isSending]);
 
   const handleSend = async () => {
 
-    if (message.trim() === "") return;
+    if (message.trim() === "" || sendingRef.current) return;
+
+    const submittedMessage = message.trim();
+    sendingRef.current = true;
+    setIsSending(true);
+    setSendError("");
+    setMessages((previous) => [...previous, { role: "user", content: submittedMessage }]);
+    setMessage("");
+    let currentThreadId = threadId;
 
     try {
       const token = await getAccessTokenSilently();
@@ -31,7 +47,6 @@ function ChatWindow() {
         headers: { Authorization: `Bearer ${token}` },
       };
 
-      let currentThreadId = threadId;
       if (!currentThreadId) {
 
       const createResponse = await api.post(
@@ -49,7 +64,7 @@ function ChatWindow() {
       const response = await api.post(
         "/thread/addMessage",
         {
-          message,
+          message: submittedMessage,
           threadId: currentThreadId
         },
         config
@@ -58,12 +73,15 @@ function ChatWindow() {
 
         setMessages(
           response.data.thread.messages)
-      setMessage("");
 
     } catch (err) {
 
       console.log(err);
+      setSendError({ threadId: currentThreadId, text: "Couldn't get a reply. Your message may have been saved. Check this chat before sending again." });
 
+    } finally {
+      sendingRef.current = false;
+      setIsSending(false);
     }
 
   };
@@ -71,7 +89,7 @@ function ChatWindow() {
 
   const handleKeyDown = (e) => {
 
-    if (e.key === "Enter") {
+    if (e.key === "Enter" && !e.nativeEvent.isComposing) {
 
       handleSend();
 
@@ -128,12 +146,24 @@ function ChatWindow() {
 
             ))}
 
+            {isSending && (
+              <div className="message assistant thinking-indicator" role="status" aria-live="polite">
+                <span>Thinking</span>
+                <span className="thinking-dots" aria-hidden="true">
+                  <span /><span /><span />
+                </span>
+              </div>
+            )}
+            <div ref={messagesEndRef} />
+
           </div>
 
         )}
 
 
         {/* Message Input */}
+
+        {sendError && sendError.threadId === threadId && <p className="chat-error" role="alert">{sendError.text}</p>}
 
         <div className="chat-input-container">
 
@@ -155,7 +185,8 @@ function ChatWindow() {
             onClick={() =>
               handleSend()
             }
-            disabled={message.trim() === ""}
+            disabled={isSending || message.trim() === ""}
+            aria-label={isSending ? "Waiting for response" : "Send message"}
           >
 
             <i className="fa-solid fa-arrow-up"></i>

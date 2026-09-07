@@ -16,7 +16,7 @@ return console.log(err)
 }
 export const createThread=async (req, res) => {
     try {
-        console.log(req.auth.payload)
+      
         
         const thread = await Thread.create({
             threadId: crypto.randomUUID(),
@@ -63,7 +63,7 @@ export const deleteThreadById=async(req,res)=>{
    const userId=req.auth.payload.sub
            const  threadId  = req.params.threadId;
 
-        console.log("Deleting threadId:", threadId);
+        
         const response=await Thread.findOneAndDelete({threadId,userId})
 
         if(!response){

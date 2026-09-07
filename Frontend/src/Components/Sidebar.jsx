@@ -11,7 +11,7 @@ function Sidebar() {
   const { getAccessTokenSilently } = useAuth0();
 
   const [threads,setThreads]=useState([]);
- const {threadId,setThreadId,setMessages,messages}=useContext(MyContext)
+ const {threadId,setThreadId,setMessages,messages,isSending}=useContext(MyContext)
  const [renamingValue,setRenamingValue]=useState("")
  const [renamingThreadId,setRenamingThreadId]=useState(null)
   
@@ -34,6 +34,7 @@ function Sidebar() {
 const [openDropdown,setOpenDropdown]=useState(null)
 
 const handleDelete=async(threadId)=>{
+  if (isSending) return;
 
   try{
       const token = await getAccessTokenSilently();
@@ -55,6 +56,7 @@ const handleDelete=async(threadId)=>{
 
 }
 const handleRename=async(threadId)=>{
+  if (isSending) return;
   try{
     if(renamingValue.trim()===""){
       return;
@@ -90,10 +92,12 @@ const handleRename=async(threadId)=>{
 }
 
 const handleNewChat=()=>{
+    if (isSending) return;
     setThreadId(null)
     setMessages([])
 }
 const handleThreadClick=async(threadId)=>{
+  if (isSending) return;
   setThreadId(threadId)
   const token = await getAccessTokenSilently();
   const response = await api.get(`/thread/getMessages/${threadId}`, {
@@ -125,7 +129,7 @@ const handleThreadClick=async(threadId)=>{
 
       {/* New Chat */}
        <div className="new-chat">
-  <button className="new-chat-button" onClick={()=>handleNewChat()}>
+        <button className="new-chat-button" disabled={isSending} onClick={()=>handleNewChat()}>
     <i className="fa-regular fa-pen-to-square"></i>
     <span>New chat</span>
   </button>
@@ -138,7 +142,7 @@ const handleThreadClick=async(threadId)=>{
         <p className="recent-title">Recents</p>
 
        {threads.map((thread) => (
-          <div className="recent-item" key={thread.threadId} onClick={()=>handleThreadClick(thread.threadId)}>
+          <div className="recent-item" key={thread.threadId} aria-disabled={isSending} onClick={()=>handleThreadClick(thread.threadId)}>
 
            {renamingThreadId === thread.threadId ? (
 

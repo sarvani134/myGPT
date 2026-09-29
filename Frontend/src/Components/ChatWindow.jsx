@@ -15,6 +15,23 @@ function ChatWindow() {
   const [sendError, setSendError] = useState("");
   const sendingRef = useRef(false);
   const messagesEndRef = useRef(null);
+  const fileInputRef=useRef(null)
+  const inputRef=useRef(null)
+  const [selectedImage,setSelectedImage]=useState(null)
+  const [imagePreview,setImagePreview]=useState("")
+  const [isPreviewOpen,setIsPreviewOpen]=useState(false)
+  const imageDialogRef = useRef(null);
+
+  useEffect(() => {
+    const dialog = imageDialogRef.current;
+    if (!dialog) return;
+
+    if (isPreviewOpen && imagePreview) {
+      if (!dialog.open) dialog.showModal();
+    } else if (dialog.open) {
+      dialog.close();
+    }
+  }, [isPreviewOpen, imagePreview]);
 
   const {
     threadId,
@@ -28,6 +45,36 @@ function ChatWindow() {
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ block: "nearest" });
   }, [messages, isSending]);
+  const handleImageChange=(e)=>{
+    try{
+      const file=e.target?.files[0]
+      if(!file){
+        return 
+      }
+       if (!file.type.startsWith("image/")) {
+    alert("Please select an image.");
+    e.target.value = "";
+    return;
+  }
+  setSelectedImage(file)
+  const reader=new FileReader()
+  reader.onload=()=>setImagePreview(reader.result)
+  reader.readAsDataURL(file)
+    inputRef.current.focus()
+
+    }
+    catch(err){
+      console.log(err)
+    }
+  }
+const removeImage=()=>{
+  setIsPreviewOpen(false);
+  setSelectedImage(null)
+  setImagePreview("")
+  if(fileInputRef.current){
+    fileInputRef.current.value=""
+  }
+}
 
   const handleSend = async () => {
 
@@ -60,19 +107,23 @@ function ChatWindow() {
 
       setThreadId(currentThreadId);
     }
+    const formData=new FormData()
+    formData.append("message",submittedMessage)
+    formData.append("threadId",currentThreadId)
+    if(selectedImage){
+      formData.append("image",selectedImage)
+    }
 
       const response = await api.post(
         "/thread/addMessage",
-        {
-          message: submittedMessage,
-          threadId: currentThreadId
-        },
+        formData,
         config
       );
       
 
         setMessages(
           response.data.thread.messages)
+          removeImage()
 
     } catch (err) {
 
@@ -105,6 +156,27 @@ function ChatWindow() {
       {/* Navbar */}
 
       <NavBar />
+
+      <dialog
+        ref={imageDialogRef}
+        className="image-dialog"
+        aria-label="Attached image preview"
+        onClose={() => setIsPreviewOpen(false)}
+        onClick={(e) => {
+          if (e.target === e.currentTarget) setIsPreviewOpen(false);
+        }}
+      >
+        <button
+          type="button"
+          className="image-dialog-close"
+          onClick={() => setIsPreviewOpen(false)}
+          aria-label="Close image preview"
+          autoFocus
+        >
+          &times;
+        </button>
+        {imagePreview && <img src={imagePreview} alt="Enlarged attachment" />}
+      </dialog>
 
 
       {/* Main Chat Area */}
@@ -164,10 +236,47 @@ function ChatWindow() {
         {/* Message Input */}
 
         {sendError && sendError.threadId === threadId && <p className="chat-error" role="alert">{sendError.text}</p>}
-
         <div className="chat-input-container">
+          {imagePreview && (
+  <div className="image-preview">
+   <button
+    type="button"
+    className="preview-open"
+    onClick={() => setIsPreviewOpen(true)}
+    aria-label="Enlarge attached image"
+  >
+    <img src={imagePreview} alt="Selected attachment" />
+  </button>
+
+  <button
+    type="button"
+    className="preview-remove"
+    onClick={removeImage}
+    aria-label="Remove image"
+  >
+    &times;
+  </button>
+
+  </div>
+)}
+          <input
+          ref={fileInputRef}
+          type="file"
+          accept="image/*"
+          onChange={handleImageChange}
+          hidden/>
+          <button
+  type="button"
+  className="attach-button"
+  onClick={() => fileInputRef.current?.click()}
+  disabled={isSending}
+  aria-label="Add image"
+>
+  +
+</button>
 
           <input
+          ref={inputRef}
             type="text"
             placeholder="What would you like to know?"
             value={message}

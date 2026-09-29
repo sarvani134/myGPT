@@ -91,9 +91,9 @@ export const addMessage = async (req, res) => {
 
 
     let thread = await Thread.findOne({ threadId ,userId});
+                    
+        // If the thread is not created which means it is a new chat then create one 
 
-
-    // If thread doesn't exist, create it
     if (!thread) {
 
       thread = await Thread.create({
@@ -104,6 +104,7 @@ export const addMessage = async (req, res) => {
       });
 
     }
+    // the title for the new thread created 
  if (thread.messages.length === 0) {
   const title = message.trim().replace(/\s+/g, " ");
   thread.title =
@@ -122,7 +123,7 @@ export const addMessage = async (req, res) => {
 
     // Get GPT response
     const assistantResponse =
-      await openaiApiResponse(message);
+      await openaiApiResponse(message,req.file);
 
 
     // Add GPT response

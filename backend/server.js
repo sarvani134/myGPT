@@ -9,6 +9,8 @@ import cors from "cors"
 
 dotenv.config();
 import dns from "node:dns";
+import userRouter from "./routes/userRoutes.js";
+import paymentRouter from "./routes/paymentRoutes.js";
 
 dns.setServers(["8.8.8.8", "1.1.1.1"]);
 
@@ -51,4 +53,6 @@ const startServer = async () => {
 
 startServer();
 app.use("/thread",threadRouter)
+app.use("/user",userRouter)
+app.use("/payment",paymentRouter)
 

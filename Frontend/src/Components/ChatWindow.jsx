@@ -275,18 +275,20 @@ const removeImage=()=>{
   +
 </button>
 
-          <input
+         
+          <textarea
           ref={inputRef}
-            type="text"
-            placeholder="What would you like to know?"
-            value={message}
-            onChange={(e) =>
-              setMessage(e.target.value)
-            }
-            onKeyDown={(e) =>
+          rows={1}
+          aria-label="Message"
+          placeholder="Type a message..."
+          value={message}
+          onChange={e=>setMessage(e.target.value)}
+          onKeyDown={(e)=>{
+            if(e.key=="Enter" && !e.shiftKey){
+              e.preventDefault()
               handleKeyDown(e)
             }
-          />
+          }}></textarea>
 
 
           <button

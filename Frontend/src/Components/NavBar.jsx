@@ -28,7 +28,7 @@ function NavBar() {
 
   <div className="profile-info">
     <p className="profile-name">{user.name}</p>
-    <p className="profile-plan">Plus</p>
+   
   </div>
 
   <div className="profile-divider"></div>

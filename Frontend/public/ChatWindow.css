@@ -19,7 +19,7 @@
 html, body { margin: 0; min-width: 320px; min-height: 100%; background: #fff; }
 #root { width: 100%; max-width: none; min-height: 100vh; margin: 0; display: block; border: 0; text-align: initial; }
 .chat-window {
-  width: calc(100% - 270px); min-height: 100vh; min-height: 100dvh; margin-left: 270px;
+  width: calc(100% - var(--sidebar-width)); min-height: 100vh; min-height: 100dvh; margin-left: var(--sidebar-width);
   background: radial-gradient(circle at 50% 42%,rgba(247,247,247,.9),transparent 36%),#fff;
   color: #202123; font-family: Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif;
 }
@@ -42,11 +42,13 @@ html, body { margin: 0; min-width: 320px; min-height: 100%; background: #fff; }
   border-color: #bdbdbd; box-shadow: 0 12px 35px rgba(0,0,0,.1),0 0 0 3px rgba(0,0,0,.025);
   transform: translateY(-1px);
 }
-.chat-input-container input {
-  min-width: 0; flex: 1; padding: 10px 0; border: 0; outline: 0; background: transparent;
-  color: #202123; font: inherit; font-size: 15px;
+.chat-input-container textarea {
+  width: 100%; min-width: 0; min-height: 44px; max-height: 144px;
+  padding: 11px 0; border: 0; outline: 0; background: transparent;
+  color: #202123; font: inherit; font-size: 15px; line-height: 22px;
+  resize: none; field-sizing: content; overflow-y: auto;
 }
-.chat-input-container input::placeholder { color: #929292; }
+.chat-input-container textarea::placeholder { color: #929292; }
 .send-button {
   width: 44px; height: 44px; flex: 0 0 44px; padding: 0; display: grid; place-items: center;
   border: 0; border-radius: 14px; background: #202020; color: #fff; font-size: 15px; cursor: pointer;
@@ -57,7 +59,7 @@ html, body { margin: 0; min-width: 320px; min-height: 100%; background: #fff; }
 .send-button:focus-visible { outline: 2px solid #333; outline-offset: 2px; }
 .send-button:disabled { background: #dedede; color: #9c9c9c; cursor: not-allowed; }
 @media (max-width: 760px) {
-  .chat-window { width: calc(100% - 76px); margin-left: 76px; }
+
   .chat-main { padding: 64px 18px 48px; }
   .welcome-text { margin-bottom: 22px; font-size: 25px; }
   .chat-input-container { min-height: 58px; padding: 6px 7px 6px 17px; border-radius: 18px; }
@@ -263,3 +265,4 @@ html, body { margin: 0; min-width: 320px; min-height: 100%; background: #fff; }
   font-size: 28px;
   cursor: pointer;
 }
+
